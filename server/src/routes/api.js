@@ -1,18 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
-// Временное хранилище
 let users = [
   { id: 1, name: 'Иван Петров', email: 'ivan@example.com', createdAt: new Date().toISOString() },
   { id: 2, name: 'Мария Сидорова', email: 'maria@example.com', createdAt: new Date().toISOString() }
 ];
 
-// GET все пользователи
 router.get('/users', (req, res) => {
   res.json(users);
 });
 
-// POST создать пользователя
 router.post('/users', (req, res) => {
   const { name, email } = req.body;
   
@@ -31,7 +28,25 @@ router.post('/users', (req, res) => {
   res.status(201).json(newUser);
 });
 
-// DELETE удалить пользователя
+router.put('/users/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { name, email } = req.body;
+  
+  const userIndex = users.findIndex(u => u.id === id);
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'Пользователь не найден' });
+  }
+  
+  if (!name && !email) {
+    return res.status(400).json({ error: 'Необходимо указать имя или email' });
+  }
+  
+  if (name) users[userIndex].name = name;
+  if (email) users[userIndex].email = email;
+  
+  res.json(users[userIndex]);
+});
+
 router.delete('/users/:id', (req, res) => {
   const id = parseInt(req.params.id);
   const userIndex = users.findIndex(u => u.id === id);
